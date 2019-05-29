@@ -31,6 +31,7 @@ void Form::on_pushButton_clicked()
 #include <wtsapi32.h>
 #include <string>
 
+#if 0x0
 std::wstring GetProcessPath(DWORD processId)
 {
     wchar_t filename[MAX_PATH];
@@ -42,6 +43,19 @@ std::wstring GetProcessPath(DWORD processId)
     QFileInfo fi(s);
     return fi.fileName().toStdWString();
 }
+#else
+QString GetProcessPath(DWORD processId)
+{
+    wchar_t filename[MAX_PATH];
+    HANDLE processHandle = NULL;
+    processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processId);
+    GetModuleFileNameEx(processHandle, NULL, filename, MAX_PATH);
+    CloseHandle(processHandle);
+    QString s = QString::fromWCharArray(filename);
+    QFileInfo fi(s);
+    return fi.fileName();
+}
+#endif
 
 //
 // プロセスIDからウィンドウハンドルを取得する。
@@ -83,7 +97,8 @@ void Form::on_pushButton_proc_enum_clicked()
         GetWindowTextW(hwnd, title, 1024);
         if(!hwnd) continue;
         wprintf(L"ProcessName:%s, ProcessId:%d, SessionId:%d HWND:0x%08x Title:%s\n",
-                GetProcessPath(ProcessInfo[i].ProcessId).c_str(), //ProcessInfo[i].pProcessName,
+                //GetProcessPath(ProcessInfo[i].ProcessId).c_str(), //ProcessInfo[i].pProcessName,
+                GetProcessPath(ProcessInfo[i].ProcessId).toStdWString().c_str(), //ProcessInfo[i].pProcessName,
                 ProcessInfo[i].ProcessId,
                 ProcessInfo[i].SessionId,
                 hwnd, title);
