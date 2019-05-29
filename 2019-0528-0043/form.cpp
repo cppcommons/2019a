@@ -9,7 +9,7 @@ Form::Form(QWidget *parent) :
     ui(new Ui::Form)
 {
     ui->setupUi(this);
-    this->setFixedSize(QSize(750, 400));
+    this->setWindowFlags(this->windowFlags()|Qt::MSWindowsFixedSizeDialogHint);
     ui->plainTextEdit->setReadOnly(true);
 }
 
