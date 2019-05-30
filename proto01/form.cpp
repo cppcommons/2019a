@@ -11,6 +11,7 @@ Form::Form(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowFlags(this->windowFlags()|Qt::MSWindowsFixedSizeDialogHint);
     ui->plainTextEdit->setReadOnly(true);
+    QObject::connect(&timer1, SIGNAL(timeout()), this, SLOT(on_timer1_timeout()));
 }
 
 Form::~Form()
@@ -20,9 +21,24 @@ Form::~Form()
 
 void Form::on_pushButton_clicked()
 {
+#if 0x0
     QMessageBox::information(this, tr(u8"タイトル"), tr(u8"メッセージ"));
     this->ui->plainTextEdit->appendPlainText(u8"ABCハロー");
     this->ui->plainTextEdit->verticalScrollBar()->setValue(this->ui->plainTextEdit->verticalScrollBar()->maximum());
+#endif
+    this->spotify_text = "";
+    this->timer1.setInterval(1);
+    //this->timer1.setInterval(10);
+    this->timer1.start();
+}
+
+void Form::on_timer1_timeout()
+{
+    //qDebug() << "Form::on_timer1_timeout()" << get_spotify_text();
+    QString text = get_spotify_text();
+    if(text == spotify_text) return;
+    spotify_text = text;
+    qDebug() << "Form::on_timer1_timeout()" << text;
 }
 
 #include <Windows.h>
@@ -112,3 +128,28 @@ void Form::on_pushButton_proc_enum_clicked()
     //WTS_PROCESS_INFO構造体配列のメモリを解放する
     WTSFreeMemory(ProcessInfo);
 }
+
+QString Form::get_spotify_text()
+{
+    HANDLE hServer = WTS_CURRENT_SERVER_HANDLE;
+    PWTS_PROCESS_INFOW ProcessInfo;
+    DWORD dwCount = 0;
+    WTSEnumerateProcessesW(hServer,
+                           0,
+                           1,
+                           &ProcessInfo,
+                           &dwCount);
+    for (DWORD i=0; i < dwCount; i++) {
+        QString processName = GetProcessPath(ProcessInfo[i].ProcessId);
+        if(processName.toLower() != "spotify.exe") continue;
+        HWND hwnd = GetWindowHandle(ProcessInfo[i].ProcessId);
+        if(!hwnd) continue;
+        wchar_t title[4096+1];
+        GetWindowTextW(hwnd, title, 4096);
+        WTSFreeMemory(ProcessInfo);
+        return QString::fromWCharArray(title);
+    }
+    WTSFreeMemory(ProcessInfo);
+    return "";
+}
+

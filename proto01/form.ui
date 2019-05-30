@@ -34,10 +34,10 @@
   <widget class="QPlainTextEdit" name="plainTextEdit">
    <property name="geometry">
     <rect>
-     <x>310</x>
-     <y>190</y>
-     <width>104</width>
-     <height>71</height>
+     <x>40</x>
+     <y>140</y>
+     <width>571</width>
+     <height>301</height>
     </rect>
    </property>
   </widget>
