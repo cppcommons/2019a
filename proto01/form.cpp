@@ -12,6 +12,7 @@ Form::Form(QWidget *parent) :
     this->setWindowFlags(this->windowFlags()|Qt::MSWindowsFixedSizeDialogHint);
     ui->plainTextEdit->setReadOnly(true);
     QObject::connect(&timer1, SIGNAL(timeout()), this, SLOT(on_timer1_timeout()));
+    QObject::connect(&spotify_elapse_timer, SIGNAL(timeout()), this, SLOT(on_spotify_elapse_timer_timeout()));
 }
 
 Form::~Form()
@@ -38,7 +39,16 @@ void Form::on_timer1_timeout()
     QString text = get_spotify_text();
     if(text == spotify_text) return;
     spotify_text = text;
+    spotify_start_time = QDateTime::currentDateTime();
+    spotify_elapse_timer.stop();
+    spotify_elapse_timer.setInterval(5000);
+    spotify_elapse_timer.start();
     qDebug() << "Form::on_timer1_timeout()" << text;
+}
+
+void Form::on_spotify_elapse_timer_timeout()
+{
+    qDebug() << "Form::on_spotify_elapse_timer_timeout()" << spotify_start_time.secsTo(QDateTime::currentDateTime());
 }
 
 #include <Windows.h>

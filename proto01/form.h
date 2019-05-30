@@ -23,10 +23,14 @@ private slots:
 
     void on_timer1_timeout();
 
+    void on_spotify_elapse_timer_timeout();
+
 private:
     Ui::Form *ui;
     QTimer timer1;
     QString spotify_text;
+    QTimer spotify_elapse_timer;
+    QDateTime spotify_start_time;
     QString get_spotify_text();
 };
 
