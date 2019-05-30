@@ -96,12 +96,18 @@ void Form::on_pushButton_proc_enum_clicked()
         wchar_t title[1024+1];
         GetWindowTextW(hwnd, title, 1024);
         if(!hwnd) continue;
+        qDebug() << "ProcessName:" << GetProcessPath(ProcessInfo[i].ProcessId)
+                 << "ProcessId:" << ProcessInfo[i].ProcessId
+                 << "HWND:" << hwnd
+                 << "Title:" << QString::fromWCharArray(title);
+#if 0x0
         wprintf(L"ProcessName:%s, ProcessId:%d, SessionId:%d HWND:0x%08x Title:%s\n",
                 //GetProcessPath(ProcessInfo[i].ProcessId).c_str(), //ProcessInfo[i].pProcessName,
                 GetProcessPath(ProcessInfo[i].ProcessId).toStdWString().c_str(), //ProcessInfo[i].pProcessName,
                 ProcessInfo[i].ProcessId,
                 ProcessInfo[i].SessionId,
                 hwnd, title);
+#endif
     }
     //WTS_PROCESS_INFO構造体配列のメモリを解放する
     WTSFreeMemory(ProcessInfo);
