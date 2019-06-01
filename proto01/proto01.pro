@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         form.cpp \
+        loopback-capture.cpp \
         main.cpp
 
 # Default rules for deployment.
@@ -24,10 +25,16 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-QMAKE_LIBS += ole32.lib psapi.lib wtsapi32.lib user32.lib
+QMAKE_LIBS += ole32.lib psapi.lib wtsapi32.lib user32.lib winmm.lib avrt.lib
 
 FORMS += \
     form.ui
 
 HEADERS += \
-    form.h
+    cleanup.h \
+    common.h \
+    form.h \
+    log.h \
+    loopback-capture.h \
+    prefs.h \
+    strconv.h
