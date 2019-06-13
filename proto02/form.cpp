@@ -163,3 +163,59 @@ QString Form::get_spotify_text()
     return "";
 }
 
+bool Form::find_spotify(DWORD *procId, HWND *hwnd)
+{
+    HANDLE hServer = WTS_CURRENT_SERVER_HANDLE;
+    PWTS_PROCESS_INFOW ProcessInfo;
+    DWORD dwCount = 0;
+    WTSEnumerateProcessesW(hServer,
+                           0,
+                           1,
+                           &ProcessInfo,
+                           &dwCount);
+    for (DWORD i=0; i < dwCount; i++) {
+        QString processName = GetProcessPath(ProcessInfo[i].ProcessId);
+        if(processName.toLower() != "spotify.exe") continue;
+        *procId = ProcessInfo[i].ProcessId;
+        *hwnd = GetWindowHandle(ProcessInfo[i].ProcessId);
+        if(!*hwnd) continue;
+        if(GetWindowLongW(*hwnd, GWL_HWNDPARENT) != 0 || !IsWindowVisible(*hwnd)) continue;
+        WTSFreeMemory(ProcessInfo);
+        return true;
+    }
+    WTSFreeMemory(ProcessInfo);
+    return false;
+}
+
+void Form::EventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
+{
+    if(GetWindowLongW(hwnd, GWL_HWNDPARENT) != 0 || !IsWindowVisible(hwnd)) return;
+    qDebug() << "EventProc" << event;
+    switch(event) {
+    case EVENT_OBJECT_NAMECHANGE:
+        wchar_t title[4096+1];
+        GetWindowTextW(hwnd, title, 4096);
+        qDebug() << "EVENT_OBJECT_NAMECHANGE" << QString::fromWCharArray(title);
+        break;
+    }
+}
+
+
+void Form::on_pushButton_evant_callback_clicked()
+{
+    DWORD procId;
+    HWND hwnd;
+    if(find_spotify(&procId, &hwnd)) {
+        HWINEVENTHOOK hHook = SetWinEventHook(
+          EVENT_MIN, //DWORD        eventMin,
+          EVENT_MAX, //DWORD        eventMax,
+          nullptr, //HMODULE      hmodWinEventProc,
+          Form::EventProc, //WINEVENTPROC pfnWinEventProc,
+          procId, //DWORD        idProcess,
+          0, //DWORD        idThread,
+          WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS //DWORD        dwFlags
+        );
+    } else {
+        qDebug() << "spotify not found!";
+    }
+}

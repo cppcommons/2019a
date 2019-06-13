@@ -67,6 +67,19 @@
     <string>プロセス列挙</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="pushButton_evant_callback">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>80</y>
+     <width>91</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>EventCallback</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
