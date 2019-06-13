@@ -190,7 +190,7 @@ bool Form::find_spotify(DWORD *procId, HWND *hwnd)
 void Form::EventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD idEventThread, DWORD dwmsEventTime)
 {
     if(GetWindowLongW(hwnd, GWL_HWNDPARENT) != 0 || !IsWindowVisible(hwnd)) return;
-    qDebug() << "EventProc" << event;
+    qDebug("EventProc: 0x%08x", event);
     switch(event) {
     case EVENT_OBJECT_NAMECHANGE:
         wchar_t title[4096+1];
